@@ -22,13 +22,15 @@
         <com.bogdankostyrko.tfstest.customview.ReactionView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:padding="30dp"
+            android:layout_marginRight="220dp"
             app:count="123"
             app:emoji="👍" />
 
         <com.bogdankostyrko.tfstest.customview.ReactionView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="60dp"
             android:layout_margin="40dp"
             app:count="52"
             app:emoji="🤦‍♂️" />
