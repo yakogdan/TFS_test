@@ -3,6 +3,10 @@ package com.bogdankostyrko.tfstest.customview
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
+import androidx.core.view.marginBottom
+import androidx.core.view.marginLeft
+import androidx.core.view.marginRight
+import androidx.core.view.marginTop
 
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,
@@ -48,11 +52,17 @@ class FlexBoxLayout @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 
-        measureChildren(widthMeasureSpec, heightMeasureSpec)
+        measureChildWithMargins(first, widthMeasureSpec, 0, heightMeasureSpec, 0)
+        measureChildWithMargins(second, widthMeasureSpec, 0, heightMeasureSpec, 0)
 
-        val widthFb = first.measuredWidth + second.measuredWidth + paddingLeft + paddingRight
-        val heightFb =
-            maxOf(first.measuredHeight, second.measuredHeight) + paddingTop + paddingBottom
+        val widthFb = paddingLeft + paddingRight +
+                first.measuredWidth + first.marginLeft + first.marginRight +
+                second.measuredWidth + second.marginLeft + second.marginRight
+
+        val heightFb = maxOf(
+            first.measuredHeight + first.marginTop + first.marginBottom,
+            second.measuredHeight + second.marginTop + second.marginBottom
+        ) + paddingTop + paddingBottom
 
         setMeasuredDimension(widthFb, heightFb)
 
@@ -107,21 +117,23 @@ class FlexBoxLayout @JvmOverloads constructor(
 
     override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
 
-        val firstLeft = paddingLeft
+        val firstLeft = paddingLeft + first.marginLeft
         val firstRight = firstLeft + first.measuredWidth
+        val firstTop = paddingTop + first.marginTop
+        val firstBottom = firstTop + first.measuredHeight
 
         first.layout(
             firstLeft,
-            paddingTop,
+            firstTop,
             firstRight,
-            first.measuredHeight + paddingTop + paddingBottom
+            firstBottom
         )
 
         second.layout(
-            firstRight,
-            paddingTop,
-            firstRight + second.measuredWidth,
-            second.measuredHeight + paddingBottom
+            firstRight + first.marginRight + second.marginLeft,
+            paddingTop + second.marginTop,
+            firstRight + first.marginRight + second.marginLeft + second.measuredWidth,
+            paddingTop + second.marginTop + second.measuredHeight
         )
 
 //        var offsetWidth = paddingLeft
@@ -159,10 +171,5 @@ class FlexBoxLayout @JvmOverloads constructor(
 
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
         return MarginLayoutParams(context, attrs)
-    }
-
-    companion object {
-
-        const val MESSAGE_WIDTH = 110f
     }
 }
