@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bogdankostyrko.tfstest.databinding.ActivityMainBinding
+import com.bogdankostyrko.tfstest.models.ReactionItem
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,5 +23,13 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val listEmoji =
+            listOf("🤣","😊","🎨","❓","😂","🎰","😒","👌","😘","💕","🤷‍♀️","🤦‍♂️","🤦‍♀️","🙌","👍")
+        repeat(100) {
+            binding.fbReactions.addReaction(getReaction(listEmoji))
+        }
     }
+
+    private fun getReaction(listEmoji: List<String>): ReactionItem = ReactionItem(reaction = listEmoji.random(), (0..300).random())
 }
