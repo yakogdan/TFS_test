@@ -7,6 +7,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
+import com.bogdankostyrko.tfstest.R
 
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,
@@ -17,9 +18,9 @@ class FlexBoxLayout @JvmOverloads constructor(
 
 //    private val reactions = mutableListOf<ReactionView>()
 
-//    init {
-//        inflate(context, R.layout.reactions_flex_box, this)
-//    }
+    init {
+        inflate(context, R.layout.reactions_flex_box, this)
+    }
 
 //    fun addReaction(reaction: ReactionItem) {
 //        val reactionView = ReactionView(context, reactionItem = reaction).apply {
