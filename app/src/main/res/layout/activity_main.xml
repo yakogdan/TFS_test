@@ -8,14 +8,30 @@
     tools:context=".MainActivity">
 
     <com.bogdankostyrko.tfstest.customview.FlexBoxLayout
-        android:background="#59f9f4"
         android:id="@+id/fb_reactions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#59f9f4"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.bogdankostyrko.tfstest.customview.ReactionView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:count="123"
+            app:emoji="👍" />
+
+        <com.bogdankostyrko.tfstest.customview.ReactionView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:count="52"
+            app:emoji="🤦‍♂️" />
+
+    </com.bogdankostyrko.tfstest.customview.FlexBoxLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
