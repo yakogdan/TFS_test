@@ -24,11 +24,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-//        val listEmoji =
-//            listOf("🤣","😊","🎨","❓","😂","🎰","😒","👌","😘","💕","🤷‍♀️","🤦‍♂️","🤦‍♀️","🙌","👍")
-//        repeat(2) {
-//            binding.fbReactions.addReaction(getReaction(listEmoji))
-//        }
+        val listEmoji =
+            listOf("🤣","😊","🎨","❓","😂","🎰","😒","👌","😘","💕","🤷‍♀️","🤦‍♂️","🤦‍♀️","🙌","👍")
+        repeat(2) {
+            binding.fbReactions.addReaction(getReaction(listEmoji))
+        }
     }
 
     private fun getReaction(listEmoji: List<String>): ReactionItem = ReactionItem(reaction = listEmoji.random(), (0..300).random())

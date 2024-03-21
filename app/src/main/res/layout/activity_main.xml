@@ -9,7 +9,7 @@
 
     <com.bogdankostyrko.tfstest.customview.FlexBoxLayout
         android:id="@+id/fb_reactions"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#59f9f4"
         android:paddingHorizontal="30dp"

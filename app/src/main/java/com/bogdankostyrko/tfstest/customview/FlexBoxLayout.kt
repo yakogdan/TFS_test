@@ -7,7 +7,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
-import com.bogdankostyrko.tfstest.R
+import com.bogdankostyrko.tfstest.models.ReactionItem
 
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,
@@ -16,40 +16,40 @@ class FlexBoxLayout @JvmOverloads constructor(
     defTheme: Int = 0,
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
-//    private val reactions = mutableListOf<ReactionView>()
+    private val reactions = mutableListOf<ReactionView>()
 
-    init {
-        inflate(context, R.layout.reactions_flex_box, this)
-    }
-
-//    fun addReaction(reaction: ReactionItem) {
-//        val reactionView = ReactionView(context, reactionItem = reaction).apply {
-//
-//            layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-//
-//            setPadding(
-//                5f.dp(context),
-//                5f.dp(context),
-//                8f.dp(context),
-//                7f.dp(context)
-//            )
-//
-//            (layoutParams as MarginLayoutParams).setMargins(
-//                5f.dp(context),
-//                3f.dp(context),
-//                5f.dp(context),
-//                3f.dp(context)
-//            )
-//        }
-//
-//        reactions.add(reactionView)
-//        addView(reactionView)
+//    init {
+//        inflate(context, R.layout.reactions_flex_box, this)
 //    }
 
+    fun addReaction(reaction: ReactionItem) {
+        val reactionView = ReactionView(context, reactionItem = reaction).apply {
+
+            layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+
+            setPadding(
+                5f.dp(context),
+                5f.dp(context),
+                8f.dp(context),
+                7f.dp(context)
+            )
+
+            (layoutParams as MarginLayoutParams).setMargins(
+                5f.dp(context),
+                3f.dp(context),
+                5f.dp(context),
+                3f.dp(context)
+            )
+        }
+
+        reactions.add(reactionView)
+        addView(reactionView)
+    }
+
     val first
-        get() = getChildAt(0)
+        get() = reactions[0]
     val second
-        get() = getChildAt(1)
+        get() = reactions[1]
 
     private var severalLines: Boolean = false
 
