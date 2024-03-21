@@ -53,38 +53,42 @@ class FlexBoxLayout @JvmOverloads constructor(
 
     private var severalLines: Boolean = false
 
+    private fun getReactionWidth(reactionView: ReactionView): Int =
+        reactionView.measuredWidth + reactionView.marginLeft + reactionView.marginRight
+
+    private fun getReactionHeight(reactionView: ReactionView): Int =
+        reactionView.measuredHeight + reactionView.marginTop + reactionView.marginBottom
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 
         measureChildWithMargins(first, widthMeasureSpec, 0, heightMeasureSpec, 0)
         measureChildWithMargins(second, widthMeasureSpec, 0, heightMeasureSpec, 0)
 
-        val parentWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val wantedWidthFb = paddingLeft + paddingRight + getReactionWidth(first) + getReactionWidth(second)
 
-        val firstWidth = first.measuredWidth + first.marginLeft + first.marginRight
-        val secondWidth = second.measuredWidth + second.marginLeft + second.marginRight
-
-        val wantedWidthFb = paddingLeft + paddingRight + firstWidth + secondWidth
-
-        val actualWidth = if (wantedWidthFb <= parentWidth) {
+        val actualWidth = if (wantedWidthFb <= MeasureSpec.getSize(widthMeasureSpec)) {
             severalLines = false
             wantedWidthFb
         } else {
             severalLines = true
-            maxOf(firstWidth, secondWidth) + paddingLeft + paddingRight
+            maxOf(getReactionWidth(first), getReactionWidth(second)) + paddingLeft + paddingRight
         }
 
         val actualHeight = if (severalLines) {
-            first.measuredHeight + first.marginTop + first.marginBottom +
-                    second.measuredHeight + second.marginTop + second.marginBottom
+            getReactionHeight(first) + getReactionHeight(second)
         } else {
             maxOf(
-                first.measuredHeight + first.marginTop + first.marginBottom,
-                second.measuredHeight + second.marginTop + second.marginBottom
+                getReactionHeight(first),
+                getReactionHeight(second)
             )
         } + paddingTop + paddingBottom
 
 
         setMeasuredDimension(actualWidth, actualHeight)
+
+
+        ////////////////////////////////////////////
+
 
 //        reactions.forEach { reactionView ->
 //
