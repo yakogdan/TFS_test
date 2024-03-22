@@ -15,8 +15,11 @@ class FlexBoxLayout @JvmOverloads constructor(
 
     private val reactions = mutableListOf<ReactionView>()
     private val reactionPadding = context.resources.getDimension(R.dimen.reaction_view_padding).toInt()
-    private var lineList = mutableListOf<MutableList<ReactionView>>()
-    private var lineHeights = mutableListOf<Int>()
+    private var linesList = mutableListOf<MutableList<ReactionView>>()
+    private var linesHeights = mutableListOf<Int>()
+
+    private var parentWidth = 0
+    private var parentHeight = 0
 
     fun addReaction(reaction: ReactionItem) {
         val reactionView = ReactionView(context, reactionItem = reaction).apply {
@@ -36,38 +39,39 @@ class FlexBoxLayout @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val parentWidth = MeasureSpec.getSize(widthMeasureSpec)
-        val parentHeight = MeasureSpec.getSize(heightMeasureSpec)
 
+        parentWidth = MeasureSpec.getSize(widthMeasureSpec)
+        parentHeight = MeasureSpec.getSize(heightMeasureSpec)
+
+        var currentLine = mutableListOf<ReactionView>()
+        var currentLineWidth = 0
         var maxHeight = 0
-        var currentWidth = 0
-        var currentRow = mutableListOf<ReactionView>()
 
-        lineList.clear()
-        lineHeights.clear()
+        linesList.clear()
+        linesHeights.clear()
 
         reactions.forEach { reactionView ->
             measureChild(reactionView, widthMeasureSpec, heightMeasureSpec)
-            if (currentWidth + reactionView.measuredWidth > parentWidth) {
-                lineList.add(currentRow)
-                lineHeights.add(maxHeight)
-                currentRow = mutableListOf()
-                currentWidth = 0
+            if (currentLineWidth + reactionView.measuredWidth > parentWidth) {
+                linesList.add(currentLine)
+                linesHeights.add(maxHeight)
+                currentLine = mutableListOf<ReactionView>()
+                currentLineWidth = 0
                 maxHeight = 0
             }
 
-            currentRow.add(reactionView)
-            currentWidth += reactionView.measuredWidth + reactionPadding
+            currentLine.add(reactionView)
+            currentLineWidth += reactionView.measuredWidth + reactionPadding
             maxHeight = maxOf(maxHeight, reactionView.measuredHeight)
         }
 
-        if (currentRow.isNotEmpty()) {
-            lineList.add(currentRow)
-            lineHeights.add(maxHeight)
+        if (currentLine.isNotEmpty()) {
+            linesList.add(currentLine)
+            linesHeights.add(maxHeight)
         }
 
         var totalHeight = paddingTop + paddingBottom
-        for (height in lineHeights) {
+        for (height in linesHeights) {
             totalHeight += height + reactionPadding
         }
         setMeasuredDimension(parentWidth, minOf(totalHeight, parentHeight))
@@ -78,16 +82,16 @@ class FlexBoxLayout @JvmOverloads constructor(
         var currentLeft = paddingLeft
         var rowWidthMax = 0
 
-        for (i in lineList.indices) {
-            val currentRow = lineList[i]
-            val rowHeight = lineHeights[i]
-            val rowWidth = currentRow.sumOf { it.measuredWidth } + (currentRow.size - 1) * reactionPadding
+        for (line in linesList.indices) {
+            val currentLine = linesList[line]
+            val lineHeights = linesHeights[line]
+            val lineWidth = currentLine.sumOf { it.measuredWidth } + (currentLine.size - 1) * reactionPadding
 
-            if (rowWidth > rowWidthMax)
-                rowWidthMax = rowWidth
+            if (lineWidth > rowWidthMax)
+                rowWidthMax = lineWidth
 
-            for (j in currentRow.indices) {
-                val child = currentRow[j]
+            for (j in currentLine.indices) {
+                val child = currentLine[j]
                 val childWidth = child.measuredWidth
                 val childHeight = child.measuredHeight
                 val childLeft = currentLeft
@@ -98,7 +102,7 @@ class FlexBoxLayout @JvmOverloads constructor(
                 currentLeft += childWidth + reactionPadding
             }
 
-            currentTop += rowHeight + reactionPadding
+            currentTop += lineHeights + reactionPadding
             currentLeft = paddingLeft
         }
     }
