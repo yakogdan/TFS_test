@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         val listEmoji =
             listOf("🤣","😊","🎨","❓","😂","🎰","😒","👌","😘","💕","🤷‍♀️","🤦‍♂️","🤦‍♀️","🙌","👍")
-        repeat(2) {
+        binding.btnAddReaction.setOnClickListener {
             binding.fbReactions.addReaction(getReaction(listEmoji))
         }
     }

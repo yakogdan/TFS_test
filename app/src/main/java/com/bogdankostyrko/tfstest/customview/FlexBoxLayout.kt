@@ -3,10 +3,7 @@ package com.bogdankostyrko.tfstest.customview
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
-import androidx.core.view.marginBottom
-import androidx.core.view.marginLeft
-import androidx.core.view.marginRight
-import androidx.core.view.marginTop
+import com.bogdankostyrko.tfstest.R
 import com.bogdankostyrko.tfstest.models.ReactionItem
 
 class FlexBoxLayout @JvmOverloads constructor(
@@ -17,10 +14,9 @@ class FlexBoxLayout @JvmOverloads constructor(
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
     private val reactions = mutableListOf<ReactionView>()
-
-//    init {
-//        inflate(context, R.layout.reactions_flex_box, this)
-//    }
+    private val reactionPadding = context.resources.getDimension(R.dimen.reaction_view_padding).toInt()
+    private var lineList = mutableListOf<MutableList<ReactionView>>()
+    private var lineHeights = mutableListOf<Int>()
 
     fun addReaction(reaction: ReactionItem) {
         val reactionView = ReactionView(context, reactionItem = reaction).apply {
@@ -28,17 +24,10 @@ class FlexBoxLayout @JvmOverloads constructor(
             layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
             setPadding(
-                5f.dp(context),
-                5f.dp(context),
-                8f.dp(context),
-                7f.dp(context)
-            )
-
-            (layoutParams as MarginLayoutParams).setMargins(
-                5f.dp(context),
-                3f.dp(context),
-                5f.dp(context),
-                3f.dp(context)
+                reactionPadding,
+                reactionPadding,
+                reactionPadding,
+                reactionPadding
             )
         }
 
@@ -46,163 +35,71 @@ class FlexBoxLayout @JvmOverloads constructor(
         addView(reactionView)
     }
 
-    val first
-        get() = reactions[0]
-    val second
-        get() = reactions[1]
-
-    private var severalLines: Boolean = false
-
-    private fun getReactionWidth(reactionView: ReactionView): Int =
-        reactionView.measuredWidth + reactionView.marginLeft + reactionView.marginRight
-
-    private fun getReactionHeight(reactionView: ReactionView): Int =
-        reactionView.measuredHeight + reactionView.marginTop + reactionView.marginBottom
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val parentWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val parentHeight = MeasureSpec.getSize(heightMeasureSpec)
 
-        measureChildWithMargins(first, widthMeasureSpec, 0, heightMeasureSpec, 0)
-        measureChildWithMargins(second, widthMeasureSpec, 0, heightMeasureSpec, 0)
+        var maxHeight = 0
+        var currentWidth = 0
+        var currentRow = mutableListOf<ReactionView>()
 
-        val wantedWidthFb = paddingLeft + paddingRight + getReactionWidth(first) + getReactionWidth(second)
+        lineList.clear()
+        lineHeights.clear()
 
-        val actualWidth = if (wantedWidthFb <= MeasureSpec.getSize(widthMeasureSpec)) {
-            severalLines = false
-            wantedWidthFb
-        } else {
-            severalLines = true
-            maxOf(getReactionWidth(first), getReactionWidth(second)) + paddingLeft + paddingRight
+        reactions.forEach { reactionView ->
+            measureChild(reactionView, widthMeasureSpec, heightMeasureSpec)
+            if (currentWidth + reactionView.measuredWidth > parentWidth) {
+                lineList.add(currentRow)
+                lineHeights.add(maxHeight)
+                currentRow = mutableListOf()
+                currentWidth = 0
+                maxHeight = 0
+            }
+
+            currentRow.add(reactionView)
+            currentWidth += reactionView.measuredWidth + reactionPadding
+            maxHeight = maxOf(maxHeight, reactionView.measuredHeight)
         }
 
-        val actualHeight = if (severalLines) {
-            getReactionHeight(first) + getReactionHeight(second)
-        } else {
-            maxOf(
-                getReactionHeight(first),
-                getReactionHeight(second)
-            )
-        } + paddingTop + paddingBottom
-
-
-        setMeasuredDimension(actualWidth, actualHeight)
-
-
-        ////////////////////////////////////////////
-
-
-//        reactions.forEach { reactionView ->
-//
-//            measureChildWithMargins(
-//                reactionView,
-//                widthMeasureSpec,
-//                0,
-//                heightMeasureSpec,
-//                0
-//            )
-//
-//
-//        }
-
-
-//        var actualHeight = paddingTop + paddingBottom
-//        var actualWidth = paddingLeft + paddingRight
-//
-//        var maxWidth = 0
-//        var maxLineHeight = 0
-//
-//        reactions.forEach { emojiView ->
-//
-//            measureChildWithMargins(emojiView, widthMeasureSpec, 0, heightMeasureSpec, 0)
-//
-//            val viewHeight = emojiView.measuredHeight + emojiView.marginTop + emojiView.marginBottom
-//
-//            if (maxLineHeight < viewHeight) {
-//                maxLineHeight = viewHeight
-//            }
-//
-//            if (actualHeight == paddingTop + paddingBottom) {
-//                actualHeight += maxLineHeight
-//            }
-//
-//            if (actualWidth > MESSAGE_WIDTH.dp(context)) {
-//                actualWidth = paddingLeft + paddingRight
-//                actualHeight += maxLineHeight
-//            }
-//
-//            val viewWidth = emojiView.measuredWidth + emojiView.marginLeft + emojiView.marginRight
-//            actualWidth += viewWidth
-//
-//            if (maxWidth < actualWidth) {
-//                maxWidth = actualWidth
-//            }
-//        }
-//        setMeasuredDimension(maxWidth, actualHeight)
-    }
-
-    override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
-
-        val firstLeft = paddingLeft + first.marginLeft
-        val firstRight = firstLeft + first.measuredWidth
-        val firstTop = paddingTop + first.marginTop
-        val firstBottom = firstTop + first.measuredHeight
-
-        first.layout(
-            firstLeft,
-            firstTop,
-            firstRight,
-            firstBottom
-        )
-
-        if (severalLines) {
-            second.layout(
-                paddingLeft + second.marginLeft,
-                firstBottom + first.marginBottom + second.marginTop,
-                paddingLeft + second.marginLeft + second.measuredWidth,
-                firstBottom + first.marginBottom + second.marginTop + second.measuredHeight
-            )
-        } else {
-            second.layout(
-                firstRight + first.marginRight + second.marginLeft,
-                paddingTop + second.marginTop,
-                firstRight + first.marginRight + second.marginLeft + second.measuredWidth,
-                paddingTop + second.marginTop + second.measuredHeight
-            )
+        if (currentRow.isNotEmpty()) {
+            lineList.add(currentRow)
+            lineHeights.add(maxHeight)
         }
 
-//        var offsetWidth = paddingLeft
-//        if (reactions.isNotEmpty()) {
-//            offsetWidth += reactions.first().marginLeft
-//        }
-//
-//        var offsetHeight = paddingTop
-//
-//        var maxHeight = 0
-//
-//        reactions.forEach { emojiView ->
-//
-//            val viewHeightWithMargin = emojiView.measuredHeight + emojiView.marginTop
-//
-//            if (maxHeight < viewHeightWithMargin) {
-//                maxHeight = viewHeightWithMargin
-//            }
-//
-//            if (offsetWidth >= MESSAGE_WIDTH.dp(context)) {
-//                offsetWidth = paddingLeft + emojiView.marginLeft
-//                offsetHeight += maxHeight
-//            }
-//
-//            emojiView.layout(
-//                offsetWidth,
-//                offsetHeight + emojiView.marginTop,
-//                offsetWidth + emojiView.measuredWidth,
-//                offsetHeight + maxHeight
-//            )
-//
-//            offsetWidth += emojiView.measuredWidth + emojiView.marginLeft + emojiView.marginRight
-//        }
+        var totalHeight = paddingTop + paddingBottom
+        for (height in lineHeights) {
+            totalHeight += height + reactionPadding
+        }
+        setMeasuredDimension(parentWidth, minOf(totalHeight, parentHeight))
     }
 
-    override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
-        return MarginLayoutParams(context, attrs)
+    override fun onLayout(p0: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        var currentTop = paddingTop
+        var currentLeft = paddingLeft
+        var rowWidthMax = 0
+
+        for (i in lineList.indices) {
+            val currentRow = lineList[i]
+            val rowHeight = lineHeights[i]
+            val rowWidth = currentRow.sumOf { it.measuredWidth } + (currentRow.size - 1) * reactionPadding
+
+            if (rowWidth > rowWidthMax)
+                rowWidthMax = rowWidth
+
+            for (j in currentRow.indices) {
+                val child = currentRow[j]
+                val childWidth = child.measuredWidth
+                val childHeight = child.measuredHeight
+                val childLeft = currentLeft
+                val childTop = currentTop
+                val childRight = currentLeft + childWidth
+                val childBottom = currentTop + childHeight
+                child.layout(childLeft, childTop, childRight, childBottom)
+                currentLeft += childWidth + reactionPadding
+            }
+
+            currentTop += rowHeight + reactionPadding
+            currentLeft = paddingLeft
+        }
     }
 }
