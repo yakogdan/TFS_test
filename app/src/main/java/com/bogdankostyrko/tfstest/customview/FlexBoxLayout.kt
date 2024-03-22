@@ -14,7 +14,10 @@ class FlexBoxLayout @JvmOverloads constructor(
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
     private val reactions = mutableListOf<ReactionView>()
-    private val reactionPadding = context.resources.getDimension(R.dimen.reaction_view_padding).toInt()
+
+    private val reactionPadding =
+        context.resources.getDimension(R.dimen.reaction_view_padding).toInt()
+
     private var linesList = mutableListOf<MutableList<ReactionView>>()
     private var linesHeights = mutableListOf<Int>()
 
@@ -43,7 +46,7 @@ class FlexBoxLayout @JvmOverloads constructor(
         parentWidth = MeasureSpec.getSize(widthMeasureSpec)
         parentHeight = MeasureSpec.getSize(heightMeasureSpec)
 
-        var currentLine = mutableListOf<ReactionView>()
+        val currentLine = mutableListOf<ReactionView>()
         var currentLineWidth = 0
         var maxHeight = 0
 
@@ -51,11 +54,15 @@ class FlexBoxLayout @JvmOverloads constructor(
         linesHeights.clear()
 
         reactions.forEach { reactionView ->
+
             measureChild(reactionView, widthMeasureSpec, heightMeasureSpec)
+
             if (currentLineWidth + reactionView.measuredWidth > parentWidth) {
+
                 linesList.add(currentLine)
                 linesHeights.add(maxHeight)
-                currentLine = mutableListOf<ReactionView>()
+
+                currentLine.clear()
                 currentLineWidth = 0
                 maxHeight = 0
             }
@@ -74,36 +81,36 @@ class FlexBoxLayout @JvmOverloads constructor(
         for (height in linesHeights) {
             totalHeight += height + reactionPadding
         }
+
         setMeasuredDimension(parentWidth, minOf(totalHeight, parentHeight))
     }
 
     override fun onLayout(p0: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+
         var currentTop = paddingTop
         var currentLeft = paddingLeft
-        var rowWidthMax = 0
+        var lineWidthMax = 0
 
         for (line in linesList.indices) {
-            val currentLine = linesList[line]
-            val lineHeights = linesHeights[line]
-            val lineWidth = currentLine.sumOf { it.measuredWidth } + (currentLine.size - 1) * reactionPadding
 
-            if (lineWidth > rowWidthMax)
-                rowWidthMax = lineWidth
+            if (getLineWidth(line) > lineWidthMax)
+                lineWidthMax = getLineWidth(line)
 
-            for (j in currentLine.indices) {
-                val child = currentLine[j]
-                val childWidth = child.measuredWidth
-                val childHeight = child.measuredHeight
-                val childLeft = currentLeft
-                val childTop = currentTop
-                val childRight = currentLeft + childWidth
-                val childBottom = currentTop + childHeight
-                child.layout(childLeft, childTop, childRight, childBottom)
-                currentLeft += childWidth + reactionPadding
+            for (reactionView in linesList[line]) {
+                reactionView.layout(
+                    currentLeft,
+                    currentTop,
+                    currentLeft + reactionView.measuredWidth,
+                    currentTop + reactionView.measuredHeight
+                )
+                currentLeft += reactionView.measuredWidth + reactionPadding
             }
 
-            currentTop += lineHeights + reactionPadding
+            currentTop += linesHeights[line] + reactionPadding
             currentLeft = paddingLeft
         }
     }
+
+    private fun getLineWidth(line: Int) =
+        linesList[line].sumOf { it.measuredWidth } + (linesList[line].size - 1) * reactionPadding
 }
