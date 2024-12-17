@@ -4,7 +4,7 @@
 Zulip Messenger - это мобильное приложение для обмена сообщениями, разработанное с использованием [Zulip API](https://zulip.com/api/).
 
 ## Снимки экрана
-<img src="screenshots/screenshot_1.png" width="360" alt="screenshot"> <img src="screenshots/screenshot_2.png" width="360" alt="screenshot">
+<img src="screenshots/screenshot_1.png" alt="screenshot"> <img src="screenshots/screenshot_2.png" width="360" alt="screenshot">
 <img src="screenshots/screenshot_3.png" width="360" alt="screenshot"> <img src="screenshots/screenshot_4.png" width="360" alt="screenshot">
 
 ## Используемые технологии
